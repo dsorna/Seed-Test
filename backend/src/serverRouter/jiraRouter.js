@@ -24,6 +24,20 @@ router
 		next();
 	});
 
+/**
+ * @api {post} api/jira/user/create/ Create Jira Access for User
+ * @apiVersion 0.1.0
+ * @apiName Create Jira User
+ * @apiGroup Jira
+ *
+ * @apiSuccess {Object} User
+ * @apiSuccess {String} jiraAccountName
+ * @apiSuccess {String} jiraPassword
+ * @apiSuccess {String} jiraHost
+ *
+ * @apiError 401 User does not exist - no User or no User._id
+ * @apiError 500 Failed to connect to Jira Server on the jiraHost Url
+ */
 router.post('/user/create/', (req, res) => {
 	if (typeof req.user !== 'undefined' && typeof req.user._id !== 'undefined') {
 		const { jiraAccountName, jiraPassword, jiraHost } = req.body;
@@ -66,6 +80,21 @@ router.post('/user/create/', (req, res) => {
 	}
 });
 
+/**
+ * @api {post} api/jira/login Jira Login
+ * @apiVersion 0.1.0
+ * @apiName Jira Login
+ * @apiGroup Jira
+ *
+ * @apiSuccess {Object} User
+ * @apiSuccess {String} jiraAccountName
+ * @apiSuccess {String} jiraPassword
+ * @apiSuccess {String} jiraHost
+ *
+ * @apiError 401 Jira Login Failed on Jira Server
+ * @apiError 500 Failed to connect to Jira Server on the jiraHost Url
+ * @apiError 500 No Jira Account sent
+ */
 router.post('/login', (req, res) => {
 	if (typeof req.body.jiraAccountName !== 'undefined') {
 		const {jiraAccountName, jiraPassword, jiraServer} = req.body;

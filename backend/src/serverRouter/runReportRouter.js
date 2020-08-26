@@ -18,16 +18,43 @@ router
 		next();
 	});
 
+/**
+ * @api {get} api/run/Feature/:issueID Run a single Feature
+ * @apiVersion 0.1.0
+ * @apiName Run Feature
+ * @apiGroup RunReport
+ *
+ * @apiParam {String} issueID 	id of the Issue
+ */
 // run single Feature
-router.get('/Feature/:issueID', (req, res) => {
+router.get('/Feature/:issueID', (req, res) => { //TODO: lower case "feature"
 	helper.runReport(req, res, stories, 'feature');
 });
 
+/**
+ * @api {get} api/run/Scenario/:issueID/:scenarioID Run a single Scenario from Feature
+ * @apiVersion 0.1.0
+ * @apiName Run Scenario
+ * @apiGroup RunReport
+ *
+ * @apiParam {String} issueID 	id of the Issue
+ * @apiParam {String} scenarioID 	id of the scenario in Issue
+ */
 // run single Scenario of a Feature
 router.get('/Scenario/:issueID/:scenarioID', (req, res) => {
 	helper.runReport(req, res, stories, 'scenario');
 });
 
+/**
+ * @api {get} api/run//report/:reportName Run a single Scenario from Feature
+ * @apiVersion 0.1.0
+ * @apiName Get Report
+ * @apiGroup RunReport
+ *
+ * @apiParam {String} reportName 	name of Report
+ *
+ * @apiSuccess {Object} user	User in Body
+ */
 router.get('/report/:reportName', (req, res) => {
   let reportName = req.params.reportName;
   helper.createReport(res, reportName);

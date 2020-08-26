@@ -33,6 +33,13 @@ router
 		next();
 	});
 
+/**
+ * @api {get} api/mongo/stepTypes Get stepTypes from DB
+ * @apiVersion 0.1.0
+ * @apiName Create Jira User
+ * @apiGroup MongoDB
+ *
+ */
 // get steptypes from mongo
 router.get('/stepTypes', async (_, res) => {
 	try {
@@ -43,7 +50,16 @@ router.get('/stepTypes', async (_, res) => {
 		handleError(res, error, error, 500);
 	}
 });
-
+/**
+ * @api {post} api/mongo/createRepository Create Repository in DB
+ * @apiVersion 0.1.0
+ * @apiName Create Repository
+ * @apiGroup MongoDB
+ *
+ * @apiSuccess {String} email - Email from User
+ * @apiSuccess {String} name - Name of the Repository to create
+ *
+ */
 // create Repository in Database
 router.post('/createRepository', async (req, res) => {
 	console.log('Email:');
@@ -54,7 +70,16 @@ router.post('/createRepository', async (req, res) => {
 	res.status(200);
 });
 
-// create Repository in Database
+/**
+ * @api {post} api/mongo/createStory Create Story in DB-Repository
+ * @apiVersion 0.1.0
+ * @apiName CreateStory
+ * @apiGroup MongoDB
+ *
+ * @apiSuccess {String} title - Title of the Story
+ * @apiSuccess {String} description - description for the Story
+ */
+// create Story in Database
 router.post('/createStory', async (req, res) => {
 	const issue = {
 		id: Math.floor(Math.random() * 10000),
@@ -68,6 +93,16 @@ router.post('/createStory', async (req, res) => {
 	});
 });
 
+/**
+ * @api {post} api/mongo/background/update/:issueID Update Background in Issue
+ * @apiVersion 0.1.0
+ * @apiName Update Background
+ * @apiGroup MongoDB
+ *
+ * @apiParam {String} issueID 	id of the Issue
+ *
+ * @apiSuccess {Object} background - from Story-background
+ */
 // update background
 router.post('/background/update/:issueID', async (req, res) => {
 	try {
@@ -80,8 +115,17 @@ router.post('/background/update/:issueID', async (req, res) => {
 		handleError(res, error, error, 500);
 	}
 });
+
+/**
+ * @api {delete} api/mongo/background/delete/:issueID/ Delete Background in Issue
+ * @apiVersion 0.1.0
+ * @apiName Delete Background
+ * @apiGroup MongoDB
+ *
+ * @apiParam {String} issueID 	id of the Issue
+ */
 // delete background
-router.delete('/background/delete/:issueID/', async (req, res) => {
+router.delete('/background/delete/:issueID/', async (req, res) => { // TODO: best Practice Method "delete" and just "/background/:issueID/"
 	try {
 		await mongo.deleteBackground(parseInt(req.params.issueID, 10));
 		helper.updateFeatureFile(parseInt(req.params.issueID, 10));
@@ -91,8 +135,17 @@ router.delete('/background/delete/:issueID/', async (req, res) => {
 		handleError(res, error, error, 500);
 	}
 });
+
+/**
+ * @api {get} api/mongo/scenario/add/:issueID Create Scenario in Issue
+ * @apiVersion 0.1.0
+ * @apiName Create Scenario
+ * @apiGroup MongoDB
+ *
+ * @apiParam {String} issueID 	id of the Issue
+ */
 // create scenario
-router.get('/scenario/add/:issueID', async (req, res) => {
+router.get('/scenario/add/:issueID', async (req, res) => { // TODO: create something should be PUT-method?
 	try {
 		const scenario = await mongo.createScenario(parseInt(req.params.issueID, 10));
 		helper.updateFeatureFile(parseInt(req.params.issueID, 10));
@@ -102,7 +155,18 @@ router.get('/scenario/add/:issueID', async (req, res) => {
 		handleError(res, error, error, 500);
 	}
 });
-// update scenario
+
+/**
+ * @api {post} api/mongo/scenario/update/:issueID Update Scenario in Issue
+ * @apiVersion 0.1.0
+ * @apiName Update Scenario
+ * @apiGroup MongoDB
+ *
+ * @apiParam {String} issueID 	id of the Issue
+ *
+ * @apiSuccess {Object} scenario -  from story.scenarios[]
+ */
+// update scenario // TODO: :scenarioID (like in delete?)
 router.post('/scenario/update/:issueID', async (req, res) => {
 	try {
 		const scenario = req.body;
@@ -114,6 +178,16 @@ router.post('/scenario/update/:issueID', async (req, res) => {
 		handleError(res, error, error, 500);
 	}
 });
+
+/**
+ * @api {delete} api/mongo/scenario/delete/:issueID/:scenarioID Delete Scenario in Issue
+ * @apiVersion 0.1.0
+ * @apiName Delete Scenario
+ * @apiGroup MongoDB
+ *
+ * @apiParam {String} issueID 	id of the Issue
+ * @apiParam {String} scenarioID	id of the scenario
+ */
 // delete scenario
 router.delete('/scenario/delete/:issueID/:scenarioID', async (req, res) => {
 	try {
@@ -126,6 +200,15 @@ router.delete('/scenario/delete/:issueID/:scenarioID', async (req, res) => {
 		handleError(res, error, error, 500);
 	}
 });
+
+/**
+ * @api {post} api/mongo/user/add Create User in DB
+ * @apiVersion 0.1.0
+ * @apiName Create User
+ * @apiGroup MongoDB
+ *
+ * @apiSuccess {Object} User
+ */
 // create user
 router.post('/user/add', async (req, res) => {
 	try {
@@ -137,6 +220,17 @@ router.post('/user/add', async (req, res) => {
 		handleError(res, error, error, 500);
 	}
 });
+
+/**
+ * @api {post} api/mongo/user/update/:userID Update User in DB
+ * @apiVersion 0.1.0
+ * @apiName Update User
+ * @apiGroup MongoDB
+ *
+ * @apiParam {String} userID 	id of the User
+ *
+ * @apiSuccess {Object} User
+ */
 // update user
 router.post('/user/update/:userID', async (req, res) => {
   try {
@@ -147,6 +241,15 @@ router.post('/user/update/:userID', async (req, res) => {
     handleError(res, error, error, 500);
   }
 });
+
+/**
+ * @api {delete} api/mongo/user/delete/:userID Delete User in DB
+ * @apiVersion 0.1.0
+ * @apiName Delete User
+ * @apiGroup MongoDB
+ *
+ * @apiParam {String} userID 	id of the User
+ */
 // delete user
 router.delete('/user/delete/:userID', async (req, res) => {
   try {
@@ -157,9 +260,19 @@ router.delete('/user/delete/:userID', async (req, res) => {
   }
 });
 
-// get userObject
+/**
+ * @api {get} api/mongo/user/ Get User Data
+ * @apiVersion 0.1.0
+ * @apiName Get User
+ * @apiGroup MongoDB
+ *
+ * @apiSuccess {Object} user	User
+ *
+ * @apiError 400	no User sent
+ */
+// get userObject //TODO: move UserID to Params: /user:userID
 router.get('/user', async (req, res) => {
-  if (req.user) {
+  if (req.user) { //TODO: need a User Object to get a User Object?
     try {
       const result = await mongo.getUserData(req.user._id);
       res.status(200).json(result);

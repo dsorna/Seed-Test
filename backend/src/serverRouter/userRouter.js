@@ -35,6 +35,14 @@ router
 		next();
 	});
 
+/**
+ * @api {post} api/user/login User Login
+ * @apiVersion 0.1.0
+ * @apiName User Login
+ * @apiGroup User
+ *
+ * @apiError 401	UserError
+ */
 // login user
 router.post('/login', (req, res, next) => {
 if(req.body.stayLoggedIn) req.session.cookie.maxAge = 864000000;
@@ -64,6 +72,16 @@ if(req.body.stayLoggedIn) req.session.cookie.maxAge = 864000000;
     }
 });
 
+/**
+ * @api {post} api/user/githubLogin User Login with Github
+ * @apiVersion 0.1.0
+ * @apiName GithubLogin
+ * @apiGroup User
+ *
+ * @apiSuccess {String} Id	Id from User.Github
+ *
+ * @apiError 401	UserError
+ */
 // login github account
 router.post('/githubLogin', (req, res) => {
 	req.body.id = parseInt(req.body.id, 10);
@@ -76,6 +94,18 @@ router.post('/githubLogin', (req, res) => {
 	})(req, res);
 });
 
+/**
+ * @api {post} api/user/githubRegister Register with Github
+ * @apiVersion 0.1.0
+ * @apiName GithubRegister
+ * @apiGroup User
+ *
+ * @apiSuccess {String} Id	user.id
+ * @apiSuccess {String} login	user.login
+ * @apiSuccess {String} githubToken user.githubToken
+ *
+ * @apiError 400	Could not Create User with Github
+ */
 // register github account
 router.post('/githubRegister', async (req, res) => {
 	try {
@@ -86,6 +116,17 @@ router.post('/githubRegister', async (req, res) => {
 	}
 });
 
+/**
+ * @api {post} api/user/mergeGithub Update DB on Github changes
+ * @apiVersion 0.1.0
+ * @apiName mergeGithub
+ * @apiGroup User
+ *
+ * @apiSuccess {String} userId	user.id
+ * @apiSuccess {String} login	user.login
+ *
+ * @apiError 400	Could not Update User
+ */
 // Update DB to reflect github changes
 router.post('/mergeGithub', async (req, res) => {
 	const { userId, login } = req.body;
@@ -101,7 +142,17 @@ router.post('/mergeGithub', async (req, res) => {
 	}
 });
 
-
+/**
+ * @api {post} api/user/register Create User
+ * @apiVersion 0.1.0
+ * @apiName createUser
+ * @apiGroup User
+ *
+ * @apiSuccess {String} email
+ * @apiSuccess {String} password
+ *
+ * @apiError 400	Could not Create User
+ */
 // registers user
 router.post('/register', async (req, res) => {
 	req.body.password = bcrypt.hashSync(req.body.password, salt);
@@ -113,6 +164,13 @@ router.post('/register', async (req, res) => {
 	}
 });
 
+/**
+ * @api {get} api/user/logout Logout
+ * @apiVersion 0.1.0
+ * @apiName Logout
+ * @apiGroup User
+ *
+ */
 // logout for user
 router.get('/logout', async (req, res) => {
     req.logout();
@@ -120,6 +178,16 @@ router.get('/logout', async (req, res) => {
     res.status(200).send({status: 'success'});
 });
 
+/**
+ * @api {get} api/user/repositories Get Repositories for a User
+ * @apiVersion 0.1.0
+ * @apiName getRepositories
+ * @apiGroup User
+ *
+ * @apiSuccess {Object} User - with "user.github.login", "user.github.githubToken"
+ *
+ * @apiError 400	Wrong GitHub name or Token
+ */
 // get repositories from all sources(Github,Jira)
 router.get('/repositories', (req, res) => {
 	let githubName;
@@ -152,6 +220,17 @@ router.get('/repositories', (req, res) => {
 		});
 });
 
+/**
+ * @api {get} api/user/stories Get Stories for a User
+ * @apiVersion 0.1.0
+ * @apiName getStories
+ * @apiGroup User
+ *
+ * @apiSuccess {Object} User	- with "user.github.login", "user.github.githubToken"
+ * @apiSuccess {String} query	options: "github", "jira" or "db"
+ *
+ * @apiError 401	Could not get Stories
+ */
 // get stories from github
 router.get('/stories', async (req, res) => {
 	const { source } = req.query;
@@ -281,6 +360,14 @@ router.get('/stories', async (req, res) => {
 	} else res.sendStatus(401);
 });
 
+/**
+ * @api {get} api/user/callback Callback for GitHub Auth
+ * @apiVersion 0.1.0
+ * @apiName GihHubCallback
+ * @apiGroup User
+ *
+ * @apiSuccess {Object} query	with query.code
+ */
 router.get('/callback', (req, res) =>{
     let code = req.query.code;
     const TOKEN_URL = 'https://github.com/login/oauth/access_token'

@@ -25,6 +25,14 @@ router
 		next();
 	});
 
+/**
+ * @api {post} /api/github/submitIssue/ submits new StepType-Request as an Issue to our github
+ * @apiVersion 0.1.0
+ * @apiName github/submitIssue
+ * @apiGroup github
+ *
+ * @apiSuccess {String} Body in request with the structure of a GitHub comment
+ */
 
 // submits new StepType-Request as an Issue to our github
 router.post('/submitIssue/', (req, res) => {
@@ -42,6 +50,18 @@ router.post('/submitIssue/', (req, res) => {
 		.catch(res.status(400));
 });
 
+/**
+ * @api {delete} /api/github/disconnectGithub Disconnects a GitHub Account from a Seed-Test Account
+ * @apiVersion 0.1.0
+ * @apiName github/disconnectGithub
+ * @apiGroup github
+ *
+ *
+ * @apiSuccess {Object} User
+ * @apiSuccess {Object} User.github with "login", "id" etc.
+ *
+ * @apiError 400 no user OR no user.github
+ */
 router.delete('/disconnectGithub', (req, res) => {
 	const { user } = req;
 	if (user && user.github) try {
