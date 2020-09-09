@@ -398,11 +398,15 @@ function runReport(req, res, stories, mode) {
         let githubValue = req.query.value.split('/')
         let githubName = githubValue[0];
         let githubRepo = githubValue[1];
-        postComment(story.issue_number, comment, githubName, githubRepo, req.user.github.githubToken);
+        postGithubComment(story.issue_number, comment, githubName, githubRepo, req.user.github.githubToken);
 
         if(mode == 'feature'){
           updateLabel(testStatus, githubName, githubRepo, req.user.github.githubToken, story.issue_number)
         }
+      }
+      if(req.query.source == 'jira' && req.user && req.user.jira){
+        let comment = renderComment(req, passed, failed, skipped, testStatus, scenariosTested, reportTime, story, scenario, mode, reportName);
+        postJiraComment(story.issue_number, comment, req.user);
       }
 
       if (scenarioID && scenario) {
@@ -414,6 +418,56 @@ function runReport(req, res, stories, mode) {
         mongo.updateStory(story.story_id, story)
       }
     });
+  });
+}
+
+function postJiraComment(issueNumber, comment, user){
+  console.log('postJiraComment', comment)
+  let { Host, AccountName, Password } = user.jira;
+  Password = decryptPassword(Password)
+  const auth = Buffer.from(`${AccountName}:${Password}`)
+    .toString('base64');
+  const cookieJar = request.jar();
+  let body = { body: comment};
+  const reqoptions = {
+    method: 'POST',
+    url: `http://${Host}/rest/api/2/issue/${issueNumber}/comment`,
+    jar: cookieJar,
+    qs: {
+      type: 'page',
+      title: 'title'
+    },
+    body: body,
+    headers: {
+      'Content-Type':'application/json',
+      'cache-control': 'no-cache',
+      Authorization: `Basic ${auth}`
+    }
+  };
+  request(reqoptions, (error2, response2, body) => {
+
+    //console.log(error2, response2, body)
+  //  request(reqoptions, (error2, response2, body) => {
+  //    let json = '';
+  //    try {
+  //      json = JSON.parse(body).projects;
+  //    } catch (e) {
+  //      console.warn('Jira Request did not work', e);
+  //      json = {};
+  //    }
+  //    let names = [];
+  //    if (Object.keys(json).length !== 0) {
+  //      for (const repo of json) {
+  //          names.push(repo.name);
+  //                  }
+  //      names = names.map(value => ({
+  //        value,
+  //        source: 'jira'
+  //      }));
+  //      resolve(names);
+  //    }
+  //    resolve([]);
+  //  });
   });
 }
 
@@ -530,7 +584,7 @@ function renderComment(req, stepsPassed, stepsFailed, stepsSkipped, testStatus, 
   return comment;
 }
 
-function postComment(issueNumber, comment, githubName, githubRepo, password){
+function postGithubComment(issueNumber, comment, githubName, githubRepo, password){
   let link = `https://api.github.com/repos/${githubName}/${githubRepo}/issues/${issueNumber}/comments`
 
   let body = { body: comment};

@@ -206,6 +206,7 @@ router.get('/stories', async (req, res) => {
 			.toString('base64');
 		const cookieJar = request.jar();
 		const tmpStories = [];
+		console.log(`http://${Host}/rest/api/2/search?jql=project=${projectKey}`)
 		const options = {
 			method: 'GET',
 			url: `http://${Host}/rest/api/2/search?jql=project=${projectKey}`,

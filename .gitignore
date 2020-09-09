@@ -93,3 +93,4 @@ install.bat
 start.bat
 update.bat
 
+*.sh
